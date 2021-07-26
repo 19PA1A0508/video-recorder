@@ -1,5 +1,6 @@
 let recordedBlobs
-
+let canvas = document.getElementById("canvas");
+let ctx= canvas.getContext("2d")
 
 
 const recordedVideo = document.querySelector('video#recorded');
@@ -82,10 +83,34 @@ document.querySelector('button#start').addEventListener('click',  () => {
   const detect= async() => {
     const prediction=await model.estimateFaces(video,false);
 
+    ctx.drawImage(video,0,0,600,400)
+
+    
+    for (let i = 0; i < prediction.length; i++) {
+      ctx.beginPath()
+      ctx.lineWidth="4";
+      ctx.strokeStyle="blue"
+      const start = prediction[i].topLeft;
+      const end = prediction[i].bottomRight;
+      const size = [end[0] - start[0], end[1] - start[1]];
+
+      
+      
+      // Render a rectangle over each detected face.
+      ctx.rect(start[0], start[1], size[0], size[1]);
+      ctx.stroke();
+      ctx.fillStyle ="red"
+    }
     console.log(prediction)
+    if (prediction.length>1){
+      alert("more than one face")
+      location.reload()
+    }
   }
   let video= document.getElementById("gum")
   video.addEventListener("loadeddata",async() => {
     model= await blazeface.load();
-    detect()
+
+    
+    setInterval(detect,100)
   })
