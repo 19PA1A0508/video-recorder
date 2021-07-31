@@ -72,17 +72,29 @@ document.querySelector('button#start').addEventListener('click',  () => {
     }
   }
   playButton.addEventListener('click', () => {
-    const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+    const superBuffer = new Blob(recordedBlobs, {type: 'video/360'});
     recordedVideo.src = null;
     recordedVideo.srcObject = null;
     recordedVideo.src = window.URL.createObjectURL(superBuffer);
      recordedVideo.controls = true;
      recordedVideo.play();
   });
+  var count = 0;
+  var coun =0
+  var y=0
+  var z =0
+  var c=0
+  
+
 
   const detect= async() => {
-    const prediction=await model.estimateFaces(video,false);
 
+    const prediction=await model.estimateFaces(video,false);
+    if(z==0) {
+      y=prediction[0].topLeft[0]
+      z++;
+      
+    }
     ctx.drawImage(video,0,0,600,400)
 
     
@@ -91,6 +103,43 @@ document.querySelector('button#start').addEventListener('click',  () => {
       ctx.lineWidth="4";
       ctx.strokeStyle="blue"
       const start = prediction[i].topLeft;
+
+      
+
+
+     
+/////////////////////////////////////////////////////////////////////////////////////////////////
+      if( ((prediction[i].topLeft[0]<=80)||(prediction[i].topLeft[0]>=400)) ||((prediction[i].topLeft[1]<=30)||(prediction[i].topLeft[1]>=300))){count=count+1;alert("please move to centre")}
+
+      if(count==3)
+      {alert("game over");
+      window.location.reload(true)}
+      if ((prediction[i].topLeft[1]<=30)||(prediction[i].topLeft[1]>=300)) {coun=coun+1; alert("please move to centre")}
+      if(coun==3){alert("game over");location.reload()}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+      
+
+
+
+
+
+
+var x=prediction[i].topLeft[0]
+
+if(Math.abs(x-y)>=45&&Math.abs(x-y)<=75){
+  c++
+  if(c==10){
+    alert("wasd")
+  }
+}
+
+
+
+
+
+
+
+
       const end = prediction[i].bottomRight;
       const size = [end[0] - start[0], end[1] - start[1]];
 
@@ -101,7 +150,7 @@ document.querySelector('button#start').addEventListener('click',  () => {
       ctx.stroke();
       ctx.fillStyle ="red"
     }
-    console.log(prediction)
+     console.log(prediction)
     if (prediction.length>1){
       alert("more than one face")
       location.reload()
